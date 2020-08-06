@@ -74,6 +74,11 @@ class Storage:
                 (user,)
             )
 
+    def get_users(self):
+        with self.get_cursor() as cursor:
+            cursor.execute('SELECT userid FROM users')
+            return [row[0] for row in cursor.fetchall()]
+
 
 QUESTIONS = [
     Question("качество еды", "избыточная", "здоровая"),
