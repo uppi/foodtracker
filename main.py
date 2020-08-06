@@ -11,7 +11,7 @@ from model import Rate
 
 from telegram.ext import Updater, CommandHandler, CallbackQueryHandler
 
-storage = Storage('db.db')
+storage = Storage(os.environ["DB"])
 storage.init_db()
 
 logging.basicConfig(

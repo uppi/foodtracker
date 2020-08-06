@@ -9,10 +9,9 @@ from storage import Storage, QUESTIONS
 
 from telegram import Bot
 
-storage = Storage('db.db')
+storage = Storage(os.environ["DB"])
 
 bot = Bot(os.environ["TOKEN"])
-
 
 def send(user_id, question, date):
     bot.sendMessage(
