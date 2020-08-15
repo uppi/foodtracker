@@ -6,8 +6,14 @@ import os
 
 from messages import question_text, question_markup
 from storage import Storage, QUESTIONS
+import logging
 
 from telegram import Bot
+
+logging.basicConfig(
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    level=logging.INFO
+)
 
 storage = Storage(os.environ["DB"])
 
@@ -25,8 +31,11 @@ def send(user_id, question, date):
 def main():
     date = datetime.date.today()
     for user_id in storage.get_users():
-        for question in QUESTIONS:
-            send(user_id, question, date)
+        try:
+            for question in QUESTIONS:
+                send(user_id, question, date)
+        except Exception as e:
+            logging.exception(f"Error for {user_id}")
 
 
 if __name__ == '__main__':
