@@ -41,6 +41,7 @@ def _mean(values):
 
 
 def stats_text(stats):
+    stats = {kind: list(map(lambda r: r.value, rates)) for kind, rates in stats.items()}
     lines = list(sorted(f'{kind}: {_mean(values):.2f} {RATE_EMOJIS[int(round(_mean(values)))]}'
                         for kind, values in stats.items()))
     rates_str = "\n".join(["За последнюю неделю:"] + lines)
@@ -50,8 +51,8 @@ def stats_text(stats):
 def draw_stats(stats, date):
     fig = go.Figure()
     days = [str(date - datetime.timedelta(days=d)) for d in reversed(range(7))]
-    for col, values in stats.items():
-        fig.add_trace(go.Scatter(x=days, y=list(values), fill='tozeroy', name=col))
+    for col, rates in stats.items():
+        fig.add_trace(go.Scatter(x=[r.date for r in rates], y=[r.value for r in rates], fill='tozeroy', name=col))
     fig.update_layout(yaxis=dict(range=[0.9, 5.1]))
     buffer = io.BytesIO()
     fig.write_image(buffer, format='png', engine='kaleido')

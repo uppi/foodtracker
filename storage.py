@@ -11,11 +11,14 @@ class Storage:
 
     @contextmanager
     def get_cursor(self):
-        with sqlite3.connect(self.db_path) as conn:
+        conn = sqlite3.connect(self.db_path)
+        try:
             cursor = conn.cursor()
             cursor.execute('PRAGMA foreign_keys = ON;')
             yield cursor
             conn.commit()
+        except:
+            conn.close()
 
     def init_db(self):
         with self.get_cursor() as cursor:
@@ -100,7 +103,7 @@ class Storage:
         )
         values_by_kind = defaultdict(list)
         for rate in rates:
-            values_by_kind[rate.kind].append(rate.value)
+            values_by_kind[rate.kind].append(rate)
         return values_by_kind
 
 
