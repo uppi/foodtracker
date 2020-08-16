@@ -1,4 +1,5 @@
 import sqlite3
+from collections import defaultdict
 from contextlib import contextmanager
 
 from model import Rate, Question
@@ -78,6 +79,15 @@ class Storage:
         with self.get_cursor() as cursor:
             cursor.execute('SELECT userid FROM users')
             return [row[0] for row in cursor.fetchall()]
+
+    def get_stats(self, start_date, end_date, user_id):
+        rates = self.get_rates(
+            user_id, start_date, end_date
+        )
+        values_by_kind = defaultdict(list)
+        for rate in rates:
+            values_by_kind[rate.kind].append(rate.value)
+        return values_by_kind
 
 
 QUESTIONS = [

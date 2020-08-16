@@ -1,5 +1,9 @@
 from collections import defaultdict
 
+import datetime
+import io
+
+import plotly.graph_objects as go
 from telegram import InlineKeyboardMarkup, InlineKeyboardButton
 
 
@@ -36,17 +40,23 @@ def _mean(values):
         return sum(values) / len(values)
 
 
-def stats_text(user_id, rate_storage, start_date, end_date):
-    rates = rate_storage.get_rates(
-        user_id, start_date, end_date
-    )
-    values_by_kind = defaultdict(list)
-    for rate in rates:
-        values_by_kind[rate.kind].append(rate.value)
+def stats_text(stats):
     lines = list(sorted(f'{kind}: {_mean(values):.2f} {RATE_EMOJIS[int(round(_mean(values)))]}'
-                        for kind, values in values_by_kind.items()))
+                        for kind, values in stats.items()))
     rates_str = "\n".join(["За последнюю неделю:"] + lines)
     return rates_str
+
+
+def draw_stats(stats, date):
+    fig = go.Figure()
+    days = [str(date - datetime.timedelta(days=d)) for d in reversed(range(7))]
+    for col, values in stats.items():
+        fig.add_trace(go.Scatter(x=days, y=list(values), fill='tozeroy', name=col))
+    fig.update_layout(yaxis=dict(range=[0.9, 5.1]))
+    buffer = io.BytesIO()
+    fig.write_image(buffer, format='png', engine='kaleido')
+    buffer.seek(0)
+    return buffer
 
 
 def unsubscribed_message():

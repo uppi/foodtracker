@@ -5,7 +5,7 @@ import datetime
 import os
 import logging
 
-from messages import question_text, question_markup, resubmit_markup, stats_text, unsubscribed_message
+from messages import question_text, question_markup, resubmit_markup, stats_text, unsubscribed_message, draw_stats
 from storage import Storage, QUESTIONS, question_by_kind
 from model import Rate
 
@@ -35,8 +35,12 @@ def start(update, context):
 def stats(update, context):
     date = datetime.date.today()
     user_id = update.message.from_user.id
-
-    update.message.reply_text(stats_text(user_id, storage, str(date - datetime.timedelta(days=7)), str(date)))
+    stats_values = storage.get_stats(str(date - datetime.timedelta(days=7)), str(date), user_id)
+    update.message.bot.sendPhoto(
+        user_id,
+        draw_stats(stats_values, date),
+        caption=stats_text(stats_values)
+    )
 
 
 def stop(update, context):
