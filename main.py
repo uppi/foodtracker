@@ -61,9 +61,18 @@ def button(update, context):
             reply_markup=question_markup(question.kind, date)
         )
     else:
-        storage.store_rate(Rate(user_id, date, kind, int(rating)))
+        rating = int(rating)
+        storage.store_rate(Rate(user_id, date, kind, rating))
+        today = datetime.date.today()
+        avg = storage.avg_rate(user_id, kind, today - datetime.timedelta(days=7), today)
+        if avg > rating:
+            mean_text = " ↘"
+        elif avg < rating:
+            mean_text = " ↗"
+        else:
+            mean_text = ""
         query.edit_message_text(
-            text=f"{date} {kind}: {rating}",
+            text=f"{date} {kind}: {rating}{mean_text}",
             reply_markup=resubmit_markup(date, kind)
         )
 

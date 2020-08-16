@@ -54,6 +54,20 @@ class Storage:
             )
             return [Rate(user, date, kind, value) for date, kind, value in cursor.fetchall()]
 
+    def avg_rate(self, user, kind, date_beginning, date_end):
+        with self.get_cursor() as cursor:
+            cursor.execute(
+                '''
+                SELECT AVG(rate) FROM rates
+                WHERE userid = ?
+                AND kind = ?
+                AND mydate >= ?
+                AND mydate <= ?
+                ''',
+                (user, kind, date_beginning, date_end)
+            )
+            return cursor.fetchall()[0][0]
+
     def store_rate(self, rate: Rate):
         with self.get_cursor() as cursor:
             cursor.execute(
