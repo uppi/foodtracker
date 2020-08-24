@@ -5,7 +5,8 @@ import datetime
 import os
 import logging
 
-from messages import question_text, question_markup, resubmit_markup, stats_text, unsubscribed_message, draw_stats
+from messages import question_text, question_markup, resubmit_markup, stats_text, unsubscribed_message, draw_stats, \
+    moving_avg
 from storage import Storage, QUESTIONS, question_by_kind
 from model import Rate
 
@@ -30,6 +31,21 @@ def start(update, context):
             question_text(question, date),
             reply_markup=question_markup(question.kind, date)
         )
+
+
+def moving_avg_stats(update, context):
+    date = datetime.date.today()
+    user_id = update.message.from_user.id
+    stats_values = storage.get_stats(date - datetime.timedelta(days=30), date, user_id)
+    moving_avg_stats_values = {
+        key: moving_avg(value, 7)
+        for key, value in stats_values.items()
+    }
+    update.message.bot.sendPhoto(
+        user_id,
+        draw_stats(moving_avg_stats_values),
+        caption=stats_text(stats_values)
+    )
 
 
 def stats(update, context):
@@ -82,6 +98,7 @@ def main():
 
     updater.dispatcher.add_handler(CommandHandler('start', start))
     updater.dispatcher.add_handler(CommandHandler('stats', stats))
+    updater.dispatcher.add_handler(CommandHandler('moving_avg_stats', moving_avg_stats))
     updater.dispatcher.add_handler(CommandHandler('stop', stop))
     updater.dispatcher.add_handler(CallbackQueryHandler(button))
 

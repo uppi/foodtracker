@@ -1,10 +1,10 @@
+import copy
 from collections import defaultdict
 
 import datetime
 import io
 
 import plotly.graph_objects as go
-import plotly.express as px
 
 from telegram import InlineKeyboardMarkup, InlineKeyboardButton
 
@@ -53,7 +53,18 @@ def stats_text(stats):
 def draw_stats(stats):
     fig = go.Figure()
 
-    colors = px.colors.qualitative.Plotly
+    colors = [
+        "#636EFA",
+        "#EF553B",
+        "#00CC96",
+        "#AB63FA",
+        "#FFA15A",
+        "#19D3F3",
+        "#FF6692",
+        "#B6E880",
+        "#FF97FF",
+        "#FECB52",
+    ]  # plotly.express.colors.qualitative.Plotly
     for (col, rates), color in zip(stats.items(), colors):
         r, g, b = int(color[1:3], 16), int(color[3:5], 16), int(color[5:7], 16)
         fig.add_trace(go.Scatter(x=[r.date for r in rates], y=[r.value for r in rates], name=col,
@@ -63,6 +74,20 @@ def draw_stats(stats):
     fig.write_image(buffer, format='png', engine='kaleido')
     buffer.seek(0)
     return buffer
+
+
+def moving_avg(rates, window_size):
+    window = []
+    result = []
+    for rate in rates:
+        window.append(rate.value)
+        if len(window) > window_size:
+            window.pop(0)
+        value = sum(window) / len(window)
+        rate = copy.copy(rate)
+        rate.value = value
+        result.append(rate)
+    return result
 
 
 def unsubscribed_message():
