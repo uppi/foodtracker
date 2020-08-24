@@ -4,6 +4,8 @@ import datetime
 import io
 
 import plotly.graph_objects as go
+import plotly.express as px
+
 from telegram import InlineKeyboardMarkup, InlineKeyboardButton
 
 
@@ -48,11 +50,14 @@ def stats_text(stats):
     return rates_str
 
 
-def draw_stats(stats, date):
+def draw_stats(stats):
     fig = go.Figure()
-    days = [str(date - datetime.timedelta(days=d)) for d in reversed(range(7))]
-    for col, rates in stats.items():
-        fig.add_trace(go.Scatter(x=[r.date for r in rates], y=[r.value for r in rates], fill='tozeroy', name=col))
+
+    colors = px.colors.qualitative.Plotly
+    for (col, rates), color in zip(stats.items(), colors):
+        r, g, b = int(color[1:3], 16), int(color[3:5], 16), int(color[5:7], 16)
+        fig.add_trace(go.Scatter(x=[r.date for r in rates], y=[r.value for r in rates], name=col,
+                                 fill='tozeroy', fillcolor=f'rgba({r}, {g}, {b}, 0.2)'))
     fig.update_layout(yaxis=dict(range=[0.9, 5.1]))
     buffer = io.BytesIO()
     fig.write_image(buffer, format='png', engine='kaleido')

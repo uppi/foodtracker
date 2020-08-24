@@ -35,10 +35,10 @@ def start(update, context):
 def stats(update, context):
     date = datetime.date.today()
     user_id = update.message.from_user.id
-    stats_values = storage.get_stats(str(date - datetime.timedelta(days=7)), str(date), user_id)
+    stats_values = storage.get_stats(date - datetime.timedelta(days=7), date, user_id)
     update.message.bot.sendPhoto(
         user_id,
-        draw_stats(stats_values, date),
+        draw_stats(stats_values),
         caption=stats_text(stats_values)
     )
 

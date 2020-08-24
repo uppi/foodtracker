@@ -98,6 +98,8 @@ class Storage:
             return [row[0] for row in cursor.fetchall()]
 
     def get_stats(self, start_date, end_date, user_id):
+        s, e = str(min(start_date, end_date)), str(max(start_date, end_date))
+        start_date, end_date = s, e
         rates = self.get_rates(
             user_id, start_date, end_date
         )
