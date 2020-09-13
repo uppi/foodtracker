@@ -44,7 +44,7 @@ def moving_avg_stats(update, context):
     update.message.bot.sendPhoto(
         user_id,
         draw_stats(moving_avg_stats_values),
-        caption=stats_text(stats_values)
+        caption=stats_text(stats_values, "За последний месяц:")
     )
 
 
@@ -55,7 +55,7 @@ def stats(update, context):
     update.message.bot.sendPhoto(
         user_id,
         draw_stats(stats_values),
-        caption=stats_text(stats_values)
+        caption=stats_text(stats_values, "За последнюю неделю:")
     )
 
 

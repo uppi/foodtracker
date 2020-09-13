@@ -42,11 +42,11 @@ def _mean(values):
         return sum(values) / len(values)
 
 
-def stats_text(stats):
+def stats_text(stats, caption):
     stats = {kind: list(map(lambda r: r.value, rates)) for kind, rates in stats.items()}
     lines = list(sorted(f'{kind}: {_mean(values):.2f} {RATE_EMOJIS[int(round(_mean(values)))]}'
                         for kind, values in stats.items()))
-    rates_str = "\n".join(["За последнюю неделю:"] + lines)
+    rates_str = "\n".join([caption] + lines)
     return rates_str
 
 
