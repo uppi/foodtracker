@@ -36,9 +36,9 @@ def start(update, context):
 def moving_avg_stats(update, context):
     date = datetime.date.today()
     user_id = update.message.from_user.id
-    stats_values = storage.get_stats(date - datetime.timedelta(days=30), date, user_id)
+    stats_values = storage.get_stats(date - datetime.timedelta(days=36), date, user_id)
     moving_avg_stats_values = {
-        key: moving_avg(value, 7)
+        key: moving_avg(value, 7)[-30:]
         for key, value in stats_values.items()
     }
     update.message.bot.sendPhoto(
